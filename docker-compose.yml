@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  ystervark.api:
+    image: ystervark.api
+    build:
+      context: ./Ystervark.API
+      dockerfile: Dockerfile

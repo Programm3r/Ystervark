@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="6.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ystervark.Database\Ystervark.Database.csproj" />
+    <ProjectReference Include="..\Ystervark.Models\Ystervark.Models.csproj" />
+  </ItemGroup>
+
+</Project>

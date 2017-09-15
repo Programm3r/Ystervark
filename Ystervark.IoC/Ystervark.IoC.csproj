@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.6.1" />
+    <PackageReference Include="AutoMapper" Version="6.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ystervark.Database\Ystervark.Database.csproj" />
+    <ProjectReference Include="..\Ystervark.Manager\Ystervark.Manager.csproj" />
+    <ProjectReference Include="..\Ystervark.Mapping\Ystervark.Mapping.csproj" />
+    <ProjectReference Include="..\Ystervark.Models\Ystervark.Models.csproj" />
+    <ProjectReference Include="..\Ystervark.Providers\Ystervark.Providers.csproj" />
+    <ProjectReference Include="..\Ystervark.Repository\Ystervark.Repository.csproj" />
+  </ItemGroup>
+
+</Project>
