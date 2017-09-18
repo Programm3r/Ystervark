@@ -22,6 +22,7 @@ namespace Ystervark.IoC
         {
             builder.RegisterType<ResourceManager>().As<IResourceManager>().PropertiesAutowired();
             builder.RegisterType<ClientManager>().As<IClientManager>().PropertiesAutowired();
+            builder.RegisterType<RegionManager>().As<IRegionManager>().PropertiesAutowired();
         }
     }
 }

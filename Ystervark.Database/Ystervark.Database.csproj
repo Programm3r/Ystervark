@@ -10,4 +10,10 @@
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Models\Region.Developer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ystervark.Models\Ystervark.Models.csproj" />
+  </ItemGroup>
 </Project>

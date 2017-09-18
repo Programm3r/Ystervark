@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BE", "BE", "{BC2E9854-5BD3-
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ystervark.FE", "Ystervark.FE\Ystervark.FE.csproj", "{58A51BEA-D62C-4C3E-AA62-FBC41F38A989}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ystervark.Instant", "..\Ystervark.Instant\Ystervark.Instant.csproj", "{3D856738-2B45-412A-9680-12C9430D296D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{58A51BEA-D62C-4C3E-AA62-FBC41F38A989}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58A51BEA-D62C-4C3E-AA62-FBC41F38A989}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58A51BEA-D62C-4C3E-AA62-FBC41F38A989}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D856738-2B45-412A-9680-12C9430D296D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D856738-2B45-412A-9680-12C9430D296D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D856738-2B45-412A-9680-12C9430D296D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D856738-2B45-412A-9680-12C9430D296D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,6 +94,7 @@ Global
 		{C9E5D782-9DBD-448B-B67A-2A7CDB6D393F} = {BC2E9854-5BD3-4202-9D33-7916220FAEC9}
 		{25FA4393-7804-4146-86EA-05FF93F18EFD} = {BC2E9854-5BD3-4202-9D33-7916220FAEC9}
 		{58A51BEA-D62C-4C3E-AA62-FBC41F38A989} = {083D6313-3A97-49E4-BDE1-1B04D7F6FAB3}
+		{3D856738-2B45-412A-9680-12C9430D296D} = {BC2E9854-5BD3-4202-9D33-7916220FAEC9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7ADDE784-A01A-45AF-A401-A57B2DE6BAA5}

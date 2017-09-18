@@ -1,7 +1,7 @@
 ﻿using System;
 using AutoMapper;
 using Ystervark.Models.Interface;
-using Ystervark.Providers.Mail;
+using Ystervark.Providers.Interface;
 using Ystervark.Repository.Interface;
 
 namespace Ystervark.Manager.Base

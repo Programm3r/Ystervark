@@ -3,19 +3,14 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,8 +23,8 @@ using Ystervark.API.Attributes;
 using Ystervark.API.Extensions;
 using Ystervark.API.Middleware;
 using Ystervark.API.Services;
+using Ystervark.Instant;
 using Ystervark.IoC;
-using Ystervark.Manager.Implementation;
 using Ystervark.Manager.Interface;
 using Ystervark.Models.Enums;
 
@@ -150,9 +145,17 @@ namespace Ystervark.API
                     new Info
                     {
                         Title = "Ystervark",
-                        Version = "v1"
+                        Version = "v1",
+                        Contact = new Contact
+                        {
+                            Email = "rga.bailey@gmail.com",
+                            Name = "Richard Bailey",
+                            Url = "https://github.com/Programm3r"
+                        }
                     });
             });
+
+            services.AddSignalR();
         }
 
         /// <summary>
@@ -191,6 +194,11 @@ namespace Ystervark.API
                 c.InjectOnCompleteJavaScript("/swagger-ui/authorization1.js");
                 c.ShowJsonEditor();
                 c.ShowRequestHeaders();
+            });
+
+            app.UseSignalR(action =>
+            {
+                action.MapHub<Chat>("chat");
             });
 
             app.UseAuthentication();

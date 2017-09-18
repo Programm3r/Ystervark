@@ -17,6 +17,14 @@ namespace Ystervark.Repository.Interface
         where TEntity : class
     {
         /// <summary>
+        /// Gets the tenant identifier.
+        /// </summary>
+        /// <value>
+        /// The tenant identifier.
+        /// </value>
+        int? TenantId { get; }
+
+        /// <summary>
         /// Changes the table name. This require the tables in the same database.
         /// </summary>
         /// <param name="table"></param>
@@ -119,7 +127,7 @@ namespace Ystervark.Repository.Interface
         /// Inserts a new entity synchronously.
         /// </summary>
         /// <param name="entity">The entity to insert.</param>
-        void Insert(TEntity entity);
+        TEntity Insert(TEntity entity);
 
         /// <summary>
         /// Inserts a range of entities synchronously.
@@ -160,7 +168,10 @@ namespace Ystervark.Repository.Interface
         /// Updates the specified entity.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        void Update(TEntity entity);
+        /// <returns>
+        /// The updated <see cref="TEntity" />
+        /// </returns>
+        TEntity Update(TEntity entity);
 
         /// <summary>
         /// Updates the specified entities.

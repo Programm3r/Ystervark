@@ -1,6 +1,7 @@
 using System.Diagnostics;
+using Ystervark.Providers.Interface;
 
-namespace Ystervark.Providers.Mail
+namespace Ystervark.Providers.Implementation.Mail
 {
     public class MailProvider : IMailProvider
     {

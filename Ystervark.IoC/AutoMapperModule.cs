@@ -26,6 +26,7 @@ namespace Ystervark.IoC
                 cfg.AddProfile(new ClientProfileConfiguration());
                 cfg.AddProfile(new ResourceRoleProfileConfiguration());
                 cfg.AddProfile(new RoleProfileConfiguration());
+                cfg.AddProfile(new RegionProfileConfiguration());
             });
             var mapper = config.CreateMapper();
             builder.RegisterInstance(mapper);

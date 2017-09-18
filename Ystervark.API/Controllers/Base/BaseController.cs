@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Ystervark.Manager.Base;
 using Ystervark.Models.DTO;
@@ -28,6 +29,14 @@ namespace Ystervark.API.Controllers.Base
         /// </value>
         protected TManager Manager { get; }
 
+        /// <summary>
+        /// Gets or sets the mapper.
+        /// </summary>
+        /// <value>
+        /// The mapper.
+        /// </value>
+        public IMapper Mapper { get; set; }
+
         #endregion
 
         #region BaseController - CTOR
@@ -39,6 +48,17 @@ namespace Ystervark.API.Controllers.Base
         protected BaseController(TManager manager)
         {
             this.Manager = manager;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseController{TManager}"/> class.
+        /// </summary>
+        /// <param name="manager">The manager.</param>
+        /// <param name="mapper">The mapper.</param>
+        protected BaseController(TManager manager, IMapper mapper)
+        {
+            this.Manager = manager;
+            this.Mapper = mapper;
         }
 
         #endregion
@@ -100,6 +120,18 @@ namespace Ystervark.API.Controllers.Base
         /// <summary>
         /// Constructs the response asynchronous.
         /// </summary>
+        /// <param name="action">The action.</param>
+        /// <returns></returns>
+        protected async Task<IActionResult> ConstructResponseAsync(Func<Task> action)
+        {
+            this.SetActiveUser();
+            await action();
+            return Ok();
+        }
+
+        /// <summary>
+        /// Constructs the response asynchronous.
+        /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="action">The action.</param>
         /// <returns></returns>
@@ -112,6 +144,28 @@ namespace Ystervark.API.Controllers.Base
                 IsSuccess = true,
                 Message = string.Empty,
                 Data = result
+            };
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Constructs the response asynchronous.
+        /// </summary>
+        /// <typeparam name="TMap">The type to use when running <see cref="AutoMapper"/>.</typeparam>
+        /// <typeparam name="TOutput">The type of the output returned by the delegate function.</typeparam>
+        /// <param name="action">The action.</param>
+        /// <returns></returns>
+        protected async Task<IActionResult> ConstructResponseAsync<TMap, TOutput>(Func<Task<TOutput>> action)
+            where TMap : class where TOutput : class
+        {
+            this.SetActiveUser();
+            var result = await action();
+            var response = new Response<TMap>
+            {
+                IsSuccess = true,
+                Message = string.Empty,
+                Data = this.Mapper.Map<TMap>(result)
             };
 
             return Ok(response);

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ystervark.Database.Models;
 using Ystervark.Manager.Base;
 using Ystervark.Models.DTO;
 

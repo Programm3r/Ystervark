@@ -1,7 +1,7 @@
 ﻿using Autofac;
-using Ystervark.Providers.Claims;
+using Ystervark.Providers.Implementation.Claims;
+using Ystervark.Providers.Implementation.Mail;
 using Ystervark.Providers.Interface;
-using Ystervark.Providers.Mail;
 
 namespace Ystervark.IoC
 {

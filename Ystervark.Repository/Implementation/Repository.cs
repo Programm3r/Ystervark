@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Practices.ObjectBuilder2;
 using Ystervark.Models.Interface;
 using Ystervark.Repository.Extensions;
 using Ystervark.Repository.Interface;
@@ -35,11 +36,6 @@ namespace Ystervark.Repository.Implementation
         private readonly DbSet<TEntity> _dbSet;
 
         /// <summary>
-        /// The tenant identifier
-        /// </summary>
-        private readonly int? _tenantId;
-
-        /// <summary>
         /// The tenant identifier property
         /// </summary>
         private readonly PropertyInfo _tenantIdProperty = typeof(ITenant).GetProperty(TenantIdStr);
@@ -58,13 +54,25 @@ namespace Ystervark.Repository.Implementation
         #region Repository - CTOR
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Repository{TEntity}"/> class.
+        /// Initializes a new instance of the <see cref="Repository{TEntity}" /> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
+        /// <exception cref="ArgumentNullException">dbContext</exception>
         public Repository(DbContext dbContext)
         {
             this._dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             this._dbSet = _dbContext.Set<TEntity>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Repository{TEntity}" /> class.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="tenantId">The tenant identifier.</param>
+        /// <exception cref="ArgumentNullException">dbContext</exception>
+        public Repository(DbContext dbContext, int? tenantId) : this(dbContext)
+        {
+            this.TenantId = tenantId;
         }
 
         #endregion
@@ -93,7 +101,7 @@ namespace Ystervark.Repository.Implementation
         {
             if (obj is ITenant tenant)
             {
-                tenant.TenantId = this._tenantId ?? -1;
+                tenant.TenantId = this.TenantId ?? -1;
             }
         }
 
@@ -106,17 +114,25 @@ namespace Ystervark.Repository.Implementation
         /// </returns>
         private IQueryable<TEntity> TenantFilterQueryable(IQueryable<TEntity> query)
         {
-            if (!typeof(TEntity).GetInterfaces().Contains(typeof(ITenant)) || !this._tenantId.HasValue || this._tenantId.Equals(-1))
+            if (!typeof(TEntity).GetInterfaces().Contains(typeof(ITenant)) || !this.TenantId.HasValue || this.TenantId.Equals(-1))
             {
                 return query;
             }
 
-            var filter = this.FilterByTenant<TEntity>(this._tenantId.Value);
+            var filter = this.FilterByTenant<TEntity>(this.TenantId.Value);
             query = query.Where(filter);
             return query;
         }
 
         #endregion
+
+        /// <summary>
+        /// Gets or sets the tenant identifier.
+        /// </summary>
+        /// <value>
+        /// The tenant identifier.
+        /// </value>
+        public int? TenantId { get; }
 
         /// <inheritdoc />
         /// <summary>
@@ -167,6 +183,8 @@ namespace Ystervark.Repository.Implementation
                 query = query.Where(predicate);
             }
 
+            query = this.TenantFilterQueryable(query);
+
             return orderBy != null ? orderBy(query).ToPagedList(pageIndex, pageSize) : query.ToPagedList(pageIndex, pageSize);
         }
 
@@ -205,6 +223,8 @@ namespace Ystervark.Repository.Implementation
             {
                 query = query.Where(predicate);
             }
+
+            query = this.TenantFilterQueryable(query);
 
             return orderBy?.Invoke(query).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken) ??
                    query.ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
@@ -291,14 +311,15 @@ namespace Ystervark.Repository.Implementation
             return _dbSet.Count(predicate);
         }
 
-        /// <inheritdoc />
         /// <summary>
         /// Inserts a new entity synchronously.
         /// </summary>
         /// <param name="entity">The entity to insert.</param>
-        public void Insert(TEntity entity)
+        public TEntity Insert(TEntity entity)
         {
+            this.SetTenantId(entity);
             var entry = _dbSet.Add(entity);
+            return entry.Entity;
         }
 
         /// <inheritdoc />
@@ -306,14 +327,23 @@ namespace Ystervark.Repository.Implementation
         /// Inserts a range of entities synchronously.
         /// </summary>
         /// <param name="entities">The entities to insert.</param>
-        public void Insert(params TEntity[] entities) => _dbSet.AddRange(entities);
+        public void Insert(params TEntity[] entities)
+        {
+            entities.ForEach(this.SetTenantId);
+            this._dbSet.AddRange(entities);
+        }
 
         /// <inheritdoc />
         /// <summary>
         /// Inserts a range of entities synchronously.
         /// </summary>
         /// <param name="entities">The entities to insert.</param>
-        public void Insert(IEnumerable<TEntity> entities) => _dbSet.AddRange(entities);
+        public void Insert(IEnumerable<TEntity> entities)
+        {
+            var enumerable = entities as IList<TEntity> ?? entities.ToList();
+            enumerable.ForEach(this.SetTenantId);
+            _dbSet.AddRange(enumerable);
+        }
 
         /// <inheritdoc />
         /// <summary>
@@ -324,6 +354,7 @@ namespace Ystervark.Repository.Implementation
         /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous insert operation.</returns>
         public Task InsertAsync(TEntity entity, CancellationToken cancellationToken = default(CancellationToken))
         {
+            this.SetTenantId(entity);
             return _dbSet.AddAsync(entity, cancellationToken);
 
             // Shadow properties?
@@ -339,7 +370,12 @@ namespace Ystervark.Repository.Implementation
         /// </summary>
         /// <param name="entities">The entities to insert.</param>
         /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous insert operation.</returns>
-        public Task InsertAsync(params TEntity[] entities) => _dbSet.AddRangeAsync(entities);
+        public Task InsertAsync(params TEntity[] entities)
+        {
+            entities.ForEach(this.SetTenantId);
+            _dbSet.AddRangeAsync(entities);
+            return Task.CompletedTask;
+        }
 
         /// <inheritdoc />
         /// <summary>
@@ -348,16 +384,26 @@ namespace Ystervark.Repository.Implementation
         /// <param name="entities">The entities to insert.</param>
         /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken" /> to observe while waiting for the task to complete.</param>
         /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> that represents the asynchronous insert operation.</returns>
-        public Task InsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken)) =>
-            _dbSet.AddRangeAsync(entities, cancellationToken);
+        public Task InsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var enumerable = entities as IList<TEntity> ?? entities.ToList();
+            enumerable.ForEach(this.SetTenantId);
+            _dbSet.AddRangeAsync(enumerable, cancellationToken);
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Updates the specified entity.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        public void Update(TEntity entity)
+        /// <returns>
+        /// The updated <see cref="!:TEntity" />
+        /// </returns>
+        public TEntity Update(TEntity entity)
         {
-            _dbSet.Update(entity);
+            this.SetTenantId(entity);
+            var updated = _dbSet.Update(entity);
+            return updated.Entity;
 
             // Shadow properties?
             //var property = _dbContext.Entry(entity).Property("LastUpdated");

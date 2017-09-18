@@ -1,4 +1,4 @@
-namespace Ystervark.Providers.Mail
+namespace Ystervark.Providers.Interface
 {
     public interface IMailProvider
     {

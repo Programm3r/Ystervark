@@ -61,22 +61,25 @@ namespace Ystervark.Repository.Implementation
         /// Gets the specified repository for the <typeparamref name="TEntity" />.
         /// </summary>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
-        /// <returns>An instance of type inherited from <see cref="T:Ystervark.Repository.Interface.IRepository`1" /> interface.</returns>
-        public IRepository<TEntity> GetRepository<TEntity>()
+        /// <param name="tenantId">The tenant identifier.</param>
+        /// <returns>
+        /// An instance of type inherited from <see cref="T:Ystervark.Repository.Interface.IRepository`1" /> interface.
+        /// </returns>
+        public IRepository<TEntity> GetRepository<TEntity>(int? tenantId = null)
             where TEntity : class
         {
-            if (_repositories == null)
+            if (this._repositories == null)
             {
-                _repositories = new Dictionary<Type, object>();
+                this._repositories = new Dictionary<Type, object>();
             }
 
             var type = typeof(TEntity);
-            if (!_repositories.ContainsKey(type))
+            if (!this._repositories.ContainsKey(type))
             {
-                _repositories[type] = new Repository<TEntity>(DbContext);
+                this._repositories[type] = new Repository<TEntity>(this.DbContext, tenantId);
             }
 
-            return (IRepository<TEntity>)_repositories[type];
+            return (IRepository<TEntity>)this._repositories[type];
         }
 
         #endregion

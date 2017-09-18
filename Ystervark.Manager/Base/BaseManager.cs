@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using AutoMapper;
 using Ystervark.Models.Interface;
-using Ystervark.Providers.Mail;
+using Ystervark.Providers.Interface;
 using Ystervark.Repository.Interface;
 
 namespace Ystervark.Manager.Base
@@ -13,6 +13,15 @@ namespace Ystervark.Manager.Base
     /// <seealso cref="IBaseManager" />
     public abstract class BaseManager : IBaseManager
     {
+        #region BaseManager - Private Fields
+
+        /// <summary>
+        /// The active resource
+        /// </summary>
+        private IResource _activeResource;
+
+        #endregion
+
         #region Implementation of IBaseManager
 
         /// <summary>
@@ -22,6 +31,7 @@ namespace Ystervark.Manager.Base
         /// The mapper.
         /// </value>
         public IMapper Mapper { get; set; }
+
         /// <summary>
         /// Gets the unit of work.
         /// </summary>
@@ -36,7 +46,18 @@ namespace Ystervark.Manager.Base
         /// <value>
         /// The active resource.
         /// </value>
-        public IResource ActiveResource { get; set; }
+        public IResource ActiveResource
+        {
+            get => this._activeResource;
+            set
+            {
+                this._activeResource = value;
+                if (this._activeResource != null)
+                {
+                    this.TenantId = this._activeResource.TenantId;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the mail provider.

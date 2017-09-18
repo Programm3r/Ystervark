@@ -8,7 +8,7 @@ using Ystervark.Models.DTO;
 using Ystervark.Models.Enums;
 using Ystervark.Providers.Interface;
 
-namespace Ystervark.Providers.Claims
+namespace Ystervark.Providers.Implementation.Claims
 {
     /// <summary>
     /// Claims Provider Class
