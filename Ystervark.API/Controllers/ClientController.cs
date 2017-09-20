@@ -32,5 +32,13 @@ namespace Ystervark.API.Controllers
         {
             return await base.ConstructResponseAsync(() => this.Manager.GetClientData());
         }
+
+        [HttpGet]
+        [Route("GetAsSummary")]
+        [SwaggerResponse(200, typeof(IEnumerable<ClientSummaryModel>))]
+        public async Task<IActionResult> GetAsSummary(bool? archived = null)
+        {
+            return await base.ConstructResponseAsync(() => this.Manager.GetAsSummary(archived));
+        }
     }
 }

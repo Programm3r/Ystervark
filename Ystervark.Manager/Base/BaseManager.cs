@@ -52,10 +52,9 @@ namespace Ystervark.Manager.Base
             set
             {
                 this._activeResource = value;
-                if (this._activeResource != null)
-                {
-                    this.TenantId = this._activeResource.TenantId;
-                }
+                if (this._activeResource == null) return;
+                this.TenantId = this._activeResource.TenantId;
+                this.UnitOfWork.TenantId = this._activeResource.TenantId;
             }
         }
 

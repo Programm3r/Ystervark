@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,10 +24,12 @@ using Ystervark.API.Attributes;
 using Ystervark.API.Extensions;
 using Ystervark.API.Middleware;
 using Ystervark.API.Services;
+using Ystervark.Database.Models;
 using Ystervark.Instant;
 using Ystervark.IoC;
 using Ystervark.Manager.Interface;
 using Ystervark.Models.Enums;
+using Contact = Swashbuckle.AspNetCore.Swagger.Contact;
 
 namespace Ystervark.API
 {
@@ -61,18 +64,9 @@ namespace Ystervark.API
         /// </remarks>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthorization(o =>
-            {
-                o.AddPolicy(AuthorizePolicy.Administrator, policy => policy.Requirements.Add(new RoleRequirement(UserRoles.Administrator)));
-                o.AddPolicy(AuthorizePolicy.ClientManager, policy => policy.Requirements.Add(new RoleRequirement(UserRoles.ClientManager)));
-                o.AddPolicy(AuthorizePolicy.ProjectManager, policy => policy.Requirements.Add(new RoleRequirement(UserRoles.ProjectManager)));
-                o.AddPolicy(AuthorizePolicy.BillingAdministrator, policy => policy.Requirements.Add(new RoleRequirement(UserRoles.BillingAdmin)));
-                o.AddPolicy(AuthorizePolicy.AdministrativeManagers,
-                    policy =>
-                        policy.Requirements.Add(new RoleRequirement(UserRoles.Administrator, UserRoles.ClientManager, UserRoles.ProjectManager)));
-                o.AddPolicy(AuthorizePolicy.Managers,
-                    policy => policy.Requirements.Add(new RoleRequirement(UserRoles.ClientManager, UserRoles.ProjectManager)));
-            });
+            services.AddDbContext<Briteplan>(options => options.UseSqlServer(Configuration["Data:ConnectionStrings:BloggingDatabase"]));
+
+            services.AddAuthorization(ConfigureAuthPolicies());
 
             services.AddSingleton<IAuthorizationHandler, CheckUserRoleHandler>();
 
@@ -108,7 +102,7 @@ namespace Ystervark.API
                             ctx.Options.Resource);
 
                         var requiredService = ctx.HttpContext.RequestServices.GetRequiredService<IResourceManager>();
-                        var resource = await requiredService.GetResourceByUsername(result.UserInfo.DisplayableId);
+                        var resource = await requiredService.GetByUsername(result.UserInfo.DisplayableId);
                         if (resource != null)
                         {
                             var claims = new List<Claim>
@@ -135,7 +129,7 @@ namespace Ystervark.API
 
             services.AddMvc().AddJsonOptions(j =>
             {
-                j.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                j.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 j.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             });
 
@@ -156,6 +150,26 @@ namespace Ystervark.API
             });
 
             services.AddSignalR();
+        }
+
+        /// <summary>
+        /// Configures the authentication policies.
+        /// </summary>
+        /// <returns></returns>
+        private static Action<AuthorizationOptions> ConfigureAuthPolicies()
+        {
+            return o =>
+            {
+                o.AddPolicy(AuthorizePolicy.Administrator, policy => policy.Requirements.Add(new RoleRequirement(UserRoles.Administrator)));
+                o.AddPolicy(AuthorizePolicy.ClientManager, policy => policy.Requirements.Add(new RoleRequirement(UserRoles.ClientManager)));
+                o.AddPolicy(AuthorizePolicy.ProjectManager, policy => policy.Requirements.Add(new RoleRequirement(UserRoles.ProjectManager)));
+                o.AddPolicy(AuthorizePolicy.BillingAdministrator, policy => policy.Requirements.Add(new RoleRequirement(UserRoles.BillingAdmin)));
+                o.AddPolicy(AuthorizePolicy.AdministrativeManagers,
+                    policy =>
+                        policy.Requirements.Add(new RoleRequirement(UserRoles.Administrator, UserRoles.ClientManager, UserRoles.ProjectManager)));
+                o.AddPolicy(AuthorizePolicy.Managers,
+                    policy => policy.Requirements.Add(new RoleRequirement(UserRoles.ClientManager, UserRoles.ProjectManager)));
+            };
         }
 
         /// <summary>

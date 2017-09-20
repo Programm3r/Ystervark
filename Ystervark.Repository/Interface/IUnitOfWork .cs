@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Ystervark.Models.Interface;
 
 namespace Ystervark.Repository.Interface
 {
-    /// <inheritdoc />
     /// <summary>
     /// Defines the interface(s) for unit of work.
     /// </summary>
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork : IDisposable, ITenant
     {
         /// <summary>
         /// Changes the database name. This require the databases in the same machine. NOTE: This only work for MySQL right now.
@@ -41,11 +41,10 @@ namespace Ystervark.Repository.Interface
         /// Gets the specified repository for the <typeparamref name="TEntity" />.
         /// </summary>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
-        /// <param name="tenantId">The tenant identifier.</param>
         /// <returns>
         /// An instance of type inherited from <see cref="IRepository{TEntity}" /> interface.
         /// </returns>
-        IRepository<TEntity> GetRepository<TEntity>(int? tenantId = null)
+        IRepository<TEntity> GetRepository<TEntity>()
             where TEntity : class;
 
         /// <summary>

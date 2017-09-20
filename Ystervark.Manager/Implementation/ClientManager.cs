@@ -4,6 +4,7 @@ using Ystervark.Database.Models;
 using Ystervark.Manager.Base;
 using Ystervark.Manager.Interface;
 using Ystervark.Models.DTO;
+using Ystervark.Repository.Extensions;
 using Ystervark.Repository.Interface;
 
 namespace Ystervark.Manager.Implementation
@@ -23,7 +24,7 @@ namespace Ystervark.Manager.Implementation
         /// <value>
         /// The client repository.
         /// </value>
-        public IRepository<Client> ClientRepository => base.UnitOfWork.GetRepository<Client>(base.TenantId);
+        public IRepository<Client> ClientRepository => base.UnitOfWork.GetRepository<Client>();
 
         #endregion
 
@@ -38,6 +39,17 @@ namespace Ystervark.Manager.Implementation
             var dbResponse = await this.ClientRepository.GetPagedListAsync(null, null, null, 1, 25);
             return base.Mapper.Map<IEnumerable<ClientModel>>(dbResponse.Items);
         }
+
+        /// <summary>
+        /// Gets the client data in a summarized collection.
+        /// </summary>
+        /// <param name="archived">if set to <c>true</c> archived clients will be included; otherwise <c>false</c>.</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ClientSummaryModel>> GetAsSummary(bool? archived = null) => await this.ClientRepository
+            .LoadStoredProcedure("dbo.GetClientsAsSummary")
+            .WithSqlParam("TenantId", base.TenantId)
+            .WithSqlParam("Archived", archived)
+            .ExecuteStoredProcAsync<ClientSummaryModel>();
 
         #endregion
     }

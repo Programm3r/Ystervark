@@ -40,18 +40,20 @@ namespace Ystervark.Manager.Implementation
         public async Task<ResourceModel> AuthenticateResource(string username, string password)
         {
             var pwd = Md5Helper.GetMd5Hash(password);
-            return Mapper.Map<ResourceModel>(await this.ResourceRepository.FindAsync(f => f.ResourceName == username && f.Password == pwd,
+            return base.Mapper.Map<ResourceModel>(await this.ResourceRepository.FindAsync(f => f.ResourceName == username && f.Password == pwd,
                 i => i.Include(x => x.ResourceRole).ThenInclude(rr => rr.Role)));
         }
+
 
         /// <summary>
         /// Gets all resource data.
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<ResourceModel>> GetAllResourceData()
+        public async Task<IEnumerable<ResourceModel>> GetAll()
         {
-            var dbResponse = await this.ResourceRepository.GetPagedListAsync(null, null, f => f.Include(q => q.ResourceRole));
-            return Mapper.Map<IEnumerable<ResourceModel>>(dbResponse.Items);
+            var dbResponse =
+                await this.ResourceRepository.GetPagedListAsync(null, null, f => f.Include(q => q.ResourceRole).ThenInclude(i => i.Role));
+            return base.Mapper.Map<IEnumerable<ResourceModel>>(dbResponse.Items);
         }
 
         /// <summary>
@@ -59,28 +61,30 @@ namespace Ystervark.Manager.Implementation
         /// </summary>
         /// <param name="resourceId">The resource identifier.</param>
         /// <returns></returns>
-        public async Task<ResourceModel> GetResourceById(int resourceId) =>
-            Mapper.Map<ResourceModel>(await this.ResourceRepository.FindAsync(f => f.ResourceId == resourceId));
+        public async Task<ResourceModel> GetById(int resourceId) =>
+            base.Mapper.Map<ResourceModel>(await this.ResourceRepository.FindAsync(f => f.ResourceId == resourceId));
 
         /// <summary>
         /// Gets the resource by username.
         /// </summary>
         /// <param name="username">The username.</param>
         /// <returns></returns>
-        public async Task<ResourceModel> GetResourceByUsername(string username)
+        public async Task<ResourceModel> GetByUsername(string username)
         {
-            return Mapper.Map<ResourceModel>(await this.ResourceRepository.FindAsync(f => f.ResourceName == username,
+            return base.Mapper.Map<ResourceModel>(await this.ResourceRepository.FindAsync(f => f.ResourceName == username,
                 i => i.Include(x => x.ResourceRole).ThenInclude(rr => rr.Role)));
         }
 
         /// <summary>
-        /// Gets the resource data.
+        /// Gets the resource data by page index and size.
         /// </summary>
+        /// <param name="pageIndex">Index of the page.</param>
+        /// <param name="pageSize">Size of the page.</param>
         /// <returns></returns>
-        public async Task<IEnumerable<ResourceModel>> GetResourceData(int pageIndex = 1, int pageSize = 25)
+        public async Task<IEnumerable<ResourceModel>> GetByPage(int pageIndex = 1, int pageSize = 25)
         {
             var dbResponse = await this.ResourceRepository.GetPagedListAsync(null, null, f => f.Include(q => q.ResourceRole), pageIndex, pageSize);
-            return Mapper.Map<IEnumerable<ResourceModel>>(dbResponse.Items);
+            return base.Mapper.Map<IEnumerable<ResourceModel>>(dbResponse.Items);
         }
 
         #endregion

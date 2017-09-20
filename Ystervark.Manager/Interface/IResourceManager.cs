@@ -19,31 +19,31 @@ namespace Ystervark.Manager.Interface
         Task<ResourceModel> AuthenticateResource(string username, string password);
 
         /// <summary>
-        /// Gets all resource data.
+        /// Gets all the resource data.
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<ResourceModel>> GetAllResourceData();
+        Task<IEnumerable<ResourceModel>> GetAll();
 
         /// <summary>
         /// Gets the resource by identifier.
         /// </summary>
         /// <param name="resourceId">The resource identifier.</param>
         /// <returns></returns>
-        Task<ResourceModel> GetResourceById(int resourceId);
+        Task<ResourceModel> GetById(int resourceId);
 
         /// <summary>
         /// Gets the resource by username.
         /// </summary>
         /// <param name="username">The username.</param>
         /// <returns></returns>
-        Task<ResourceModel> GetResourceByUsername(string username);
+        Task<ResourceModel> GetByUsername(string username);
 
         /// <summary>
-        /// Gets the resource data.
+        /// Gets the resource data by page index and size.
         /// </summary>
         /// <param name="pageIndex">Index of the page.</param>
         /// <param name="pageSize">Size of the page.</param>
         /// <returns></returns>
-        Task<IEnumerable<ResourceModel>> GetResourceData(int pageIndex = 1, int pageSize = 25);
+        Task<IEnumerable<ResourceModel>> GetByPage(int pageIndex = 1, int pageSize = 25);
     }
 }

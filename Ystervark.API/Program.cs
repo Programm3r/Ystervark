@@ -36,8 +36,9 @@ namespace Ystervark.API
             .UseDefaultServiceProvider((context, options) =>
             {
                 options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
-            })
+            })            
             .UseStartup<Startup>()
+            .UseUrls("http://localhost:5050")
             .Build();
     }
 }

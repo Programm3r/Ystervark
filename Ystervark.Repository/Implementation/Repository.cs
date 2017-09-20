@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -70,7 +71,8 @@ namespace Ystervark.Repository.Implementation
         /// <param name="dbContext">The database context.</param>
         /// <param name="tenantId">The tenant identifier.</param>
         /// <exception cref="ArgumentNullException">dbContext</exception>
-        public Repository(DbContext dbContext, int? tenantId) : this(dbContext)
+        public Repository(DbContext dbContext, int? tenantId)
+            : this(dbContext)
         {
             this.TenantId = tenantId;
         }
@@ -114,7 +116,8 @@ namespace Ystervark.Repository.Implementation
         /// </returns>
         private IQueryable<TEntity> TenantFilterQueryable(IQueryable<TEntity> query)
         {
-            if (!typeof(TEntity).GetInterfaces().Contains(typeof(ITenant)) || !this.TenantId.HasValue || this.TenantId.Equals(-1))
+            if (!typeof(TEntity).GetInterfaces()
+                    .Contains(typeof(ITenant)) || !this.TenantId.HasValue || this.TenantId.Equals(-1))
             {
                 return query;
             }
@@ -126,13 +129,19 @@ namespace Ystervark.Repository.Implementation
 
         #endregion
 
+        #region ITenant Implementation
+
         /// <summary>
-        /// Gets or sets the tenant identifier.
+        /// Gets the tenant identifier.
         /// </summary>
         /// <value>
         /// The tenant identifier.
         /// </value>
         public int? TenantId { get; }
+
+        #endregion
+
+        #region IRepository Implementation
 
         /// <inheritdoc />
         /// <summary>
@@ -144,7 +153,8 @@ namespace Ystervark.Repository.Implementation
         /// </remarks>
         public void ChangeTable(string table)
         {
-            if (_dbContext.Model.FindEntityType(typeof(TEntity)).Relational() is RelationalEntityTypeAnnotations relational)
+            if (_dbContext.Model.FindEntityType(typeof(TEntity))
+                .Relational() is RelationalEntityTypeAnnotations relational)
             {
                 relational.TableName = table;
             }
@@ -152,92 +162,61 @@ namespace Ystervark.Repository.Implementation
 
         /// <inheritdoc />
         /// <summary>
-        /// Gets the <see cref="T:Ystervark.Repository.Extensions.IPagedList`1" /> based on a predicate, order by delegate and page information. This method default no-tracking query.
+        /// Gets the count based on a predicate.
         /// </summary>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageIndex">The index of page.</param>
-        /// <param name="pageSize">The size of the page.</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <returns>An <see cref="T:Ystervark.Repository.Extensions.IPagedList`1" /> that contains elements that satisfy the condition specified by <paramref name="predicate" />.</returns>
-        /// <remarks>This method default no-tracking query.</remarks>
-        public IPagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> predicate = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageIndex = 0, int pageSize = 20,
-            bool disableTracking = true)
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public int Count(Expression<Func<TEntity, bool>> predicate = null)
         {
-            IQueryable<TEntity> query = _dbSet;
-            if (disableTracking)
-            {
-                query = query.AsNoTracking();
-            }
-
-            if (include != null)
-            {
-                query = include(query);
-            }
-
-            if (predicate != null)
-            {
-                query = query.Where(predicate);
-            }
-
-            query = this.TenantFilterQueryable(query);
-
-            return orderBy != null ? orderBy(query).ToPagedList(pageIndex, pageSize) : query.ToPagedList(pageIndex, pageSize);
+            return _dbSet.Count(predicate);
         }
 
-        /// <inheritdoc />
         /// <summary>
-        /// Gets the <see cref="T:Ystervark.Repository.Extensions.IPagedList`1" /> based on a predicate, order by delegate and page information. This method default no-tracking query.
+        /// Deletes the specified entity.
         /// </summary>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageIndex">The index of page.</param>
-        /// <param name="pageSize">The size of the page.</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="cancellationToken">
-        ///     A <see cref="T:System.Threading.CancellationToken" /> to observe while waiting for the task to complete.
-        /// </param>
-        /// <returns>An <see cref="T:Ystervark.Repository.Extensions.IPagedList`1" /> that contains elements that satisfy the condition specified by <paramref name="predicate" />.</returns>
-        /// <remarks>This method default no-tracking query.</remarks>
-        public Task<IPagedList<TEntity>> GetPagedListAsync(Expression<Func<TEntity, bool>> predicate = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageIndex = 0, int pageSize = 20,
-            bool disableTracking = true, CancellationToken cancellationToken = default(CancellationToken))
+        /// <param name="entity">The entity to delete.</param>
+        public void Delete(TEntity entity) => _dbSet.Remove(entity);
+
+        /// <summary>
+        /// Deletes the entity by the specified primary key.
+        /// </summary>
+        /// <param name="id">The primary key value.</param>
+        public void Delete(object id)
         {
-            IQueryable<TEntity> query = _dbSet;
-            if (disableTracking)
+            // using a stub entity to mark for deletion
+            var typeInfo = typeof(TEntity).GetTypeInfo();
+            var key = _dbContext.Model.FindEntityType(typeInfo.Name)
+                .FindPrimaryKey()
+                .Properties.FirstOrDefault();
+            var property = typeInfo.GetProperty(key?.Name);
+            if (property != null)
             {
-                query = query.AsNoTracking();
+                var entity = Activator.CreateInstance<TEntity>();
+                property.SetValue(entity, id);
+                _dbContext.Entry(entity)
+                    .State = EntityState.Deleted;
             }
-
-            if (include != null)
+            else
             {
-                query = include(query);
+                var entity = _dbSet.Find(id);
+                if (entity != null)
+                {
+                    Delete(entity);
+                }
             }
-
-            if (predicate != null)
-            {
-                query = query.Where(predicate);
-            }
-
-            query = this.TenantFilterQueryable(query);
-
-            return orderBy?.Invoke(query).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken) ??
-                   query.ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
         }
 
-        /// <inheritdoc />
         /// <summary>
-        /// Uses raw SQL queries to fetch the specified <typeparamref name="TEntity" /> data.
+        /// Deletes the specified entities.
         /// </summary>
-        /// <param name="sql">The raw SQL.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>An <see cref="T:System.Linq.IQueryable`1" /> that contains elements that satisfy the condition specified by raw SQL.</returns>
-        public IQueryable<TEntity> FromSql(string sql, params object[] parameters) => _dbSet.FromSql(sql, parameters);
+        /// <param name="entities">The entities.</param>
+        public void Delete(params TEntity[] entities) => _dbSet.RemoveRange(entities);
+
+        /// <summary>
+        /// Deletes the specified entities.
+        /// </summary>
+        /// <param name="entities">The entities.</param>
+        public void Delete(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
 
         /// <inheritdoc />
         /// <summary>
@@ -302,13 +281,93 @@ namespace Ystervark.Repository.Implementation
 
         /// <inheritdoc />
         /// <summary>
-        /// Gets the count based on a predicate.
+        /// Uses raw SQL queries to fetch the specified <typeparamref name="TEntity" /> data.
         /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public int Count(Expression<Func<TEntity, bool>> predicate = null)
+        /// <param name="sql">The raw SQL.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>An <see cref="T:System.Linq.IQueryable`1" /> that contains elements that satisfy the condition specified by raw SQL.</returns>
+        public IQueryable<TEntity> FromSql(string sql, params object[] parameters) => _dbSet.FromSql(sql, parameters);
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Gets the <see cref="T:Ystervark.Repository.Extensions.IPagedList`1" /> based on a predicate, order by delegate and page information. This method default no-tracking query.
+        /// </summary>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <param name="orderBy">A function to order elements.</param>
+        /// <param name="include">A function to include navigation properties</param>
+        /// <param name="pageIndex">The index of page.</param>
+        /// <param name="pageSize">The size of the page.</param>
+        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <returns>An <see cref="T:Ystervark.Repository.Extensions.IPagedList`1" /> that contains elements that satisfy the condition specified by <paramref name="predicate" />.</returns>
+        /// <remarks>This method default no-tracking query.</remarks>
+        public IPagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> predicate = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageIndex = 0, int pageSize = 20,
+            bool disableTracking = true)
         {
-            return _dbSet.Count(predicate);
+            IQueryable<TEntity> query = _dbSet;
+            if (disableTracking)
+            {
+                query = query.AsNoTracking();
+            }
+
+            if (include != null)
+            {
+                query = include(query);
+            }
+
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+            query = this.TenantFilterQueryable(query);
+
+            return orderBy != null ? orderBy(query)
+                .ToPagedList(pageIndex, pageSize) : query.ToPagedList(pageIndex, pageSize);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Gets the <see cref="T:Ystervark.Repository.Extensions.IPagedList`1" /> based on a predicate, order by delegate and page information. This method default no-tracking query.
+        /// </summary>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <param name="orderBy">A function to order elements.</param>
+        /// <param name="include">A function to include navigation properties</param>
+        /// <param name="pageIndex">The index of page.</param>
+        /// <param name="pageSize">The size of the page.</param>
+        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+        /// <param name="cancellationToken">
+        ///     A <see cref="T:System.Threading.CancellationToken" /> to observe while waiting for the task to complete.
+        /// </param>
+        /// <returns>An <see cref="T:Ystervark.Repository.Extensions.IPagedList`1" /> that contains elements that satisfy the condition specified by <paramref name="predicate" />.</returns>
+        /// <remarks>This method default no-tracking query.</remarks>
+        public Task<IPagedList<TEntity>> GetPagedListAsync(Expression<Func<TEntity, bool>> predicate = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null, int pageIndex = 0, int pageSize = 20,
+            bool disableTracking = true, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IQueryable<TEntity> query = _dbSet;
+            if (disableTracking)
+            {
+                query = query.AsNoTracking();
+            }
+
+            if (include != null)
+            {
+                query = include(query);
+            }
+
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+            query = this.TenantFilterQueryable(query);
+
+            return orderBy?.Invoke(query)
+                       .ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken) ??
+                   query.ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
         }
 
         /// <summary>
@@ -393,6 +452,16 @@ namespace Ystervark.Repository.Implementation
         }
 
         /// <summary>
+        /// Loads the stored procedure.
+        /// </summary>
+        /// <param name="storedProcName">Name of the stored procedure.</param>
+        /// <returns></returns>
+        public DbCommand LoadStoredProcedure(string storedProcName)
+        {
+            return this._dbContext.LoadStoredProc(storedProcName);
+        }
+
+        /// <summary>
         /// Updates the specified entity.
         /// </summary>
         /// <param name="entity">The entity.</param>
@@ -425,49 +494,7 @@ namespace Ystervark.Repository.Implementation
         /// <param name="entities">The entities.</param>
         public void Update(IEnumerable<TEntity> entities) => _dbSet.UpdateRange(entities);
 
-        /// <summary>
-        /// Deletes the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity to delete.</param>
-        public void Delete(TEntity entity) => _dbSet.Remove(entity);
-
-        /// <summary>
-        /// Deletes the entity by the specified primary key.
-        /// </summary>
-        /// <param name="id">The primary key value.</param>
-        public void Delete(object id)
-        {
-            // using a stub entity to mark for deletion
-            var typeInfo = typeof(TEntity).GetTypeInfo();
-            var key = _dbContext.Model.FindEntityType(typeInfo.Name).FindPrimaryKey().Properties.FirstOrDefault();
-            var property = typeInfo.GetProperty(key?.Name);
-            if (property != null)
-            {
-                var entity = Activator.CreateInstance<TEntity>();
-                property.SetValue(entity, id);
-                _dbContext.Entry(entity).State = EntityState.Deleted;
-            }
-            else
-            {
-                var entity = _dbSet.Find(id);
-                if (entity != null)
-                {
-                    Delete(entity);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Deletes the specified entities.
-        /// </summary>
-        /// <param name="entities">The entities.</param>
-        public void Delete(params TEntity[] entities) => _dbSet.RemoveRange(entities);
-
-        /// <summary>
-        /// Deletes the specified entities.
-        /// </summary>
-        /// <param name="entities">The entities.</param>
-        public void Delete(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
+        #endregion
 
         #region IHasTransactions Implementation
 

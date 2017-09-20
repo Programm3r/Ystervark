@@ -22,7 +22,7 @@ namespace Ystervark.Manager.Implementation
         /// <value>
         /// The region repository.
         /// </value>
-        public IRepository<Region> RegionRepository => base.UnitOfWork.GetRepository<Region>(base.TenantId);
+        public IRepository<Region> RegionRepository => base.UnitOfWork.GetRepository<Region>();
 
         #endregion
 

@@ -7,6 +7,7 @@ using Ystervark.API.Controllers.Base;
 using Ystervark.Manager.Interface;
 using Ystervark.Models.DTO;
 using Ystervark.Models.Enums;
+using Ystervark.Models.Helper;
 
 namespace Ystervark.API.Controllers
 {
@@ -31,10 +32,10 @@ namespace Ystervark.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [SwaggerResponse(200, typeof(IEnumerable<ResourceModel>))]        
+        [SwaggerResponse(200, typeof(Response<IEnumerable<ResourceModel>>))]        
         public async Task<IActionResult> Get()
         {
-            return await base.ConstructResponseAsync(() => this.Manager.GetAllResourceData());
+            return await base.ConstructResponseAsync(() => this.Manager.GetAll());
         }
 
         /// <summary>
@@ -44,10 +45,10 @@ namespace Ystervark.API.Controllers
         /// <param name="pageSize">Size of the page.</param>
         /// <returns></returns>
         [HttpGet("Page/{pageIndex}/{pageSize}")]
-        [SwaggerResponse(200, typeof(IEnumerable<ResourceModel>))]
+        [SwaggerResponse(200, typeof(Response<IEnumerable<ResourceModel>>))]
         public async Task<IActionResult> Get(int pageIndex, int pageSize)
         {
-            return await base.ConstructResponseAsync(() => this.Manager.GetResourceData(pageIndex, pageSize));
+            return await base.ConstructResponseAsync(() => this.Manager.GetByPage(pageIndex, pageSize));
         }
     }
 }

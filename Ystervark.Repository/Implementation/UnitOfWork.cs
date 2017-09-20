@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
+using Ystervark.Models.Interface;
 using Ystervark.Repository.Interface;
 
 namespace Ystervark.Repository.Implementation
@@ -24,6 +25,7 @@ namespace Ystervark.Repository.Implementation
         /// The disposed
         /// </summary>
         private bool _disposed;
+
         /// <summary>
         /// The repositories
         /// </summary>
@@ -53,7 +55,7 @@ namespace Ystervark.Repository.Implementation
             DbContext = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        #endregion        
+        #endregion
 
         #region IRepositoryFactory Implementation
 
@@ -61,11 +63,10 @@ namespace Ystervark.Repository.Implementation
         /// Gets the specified repository for the <typeparamref name="TEntity" />.
         /// </summary>
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
-        /// <param name="tenantId">The tenant identifier.</param>
         /// <returns>
         /// An instance of type inherited from <see cref="T:Ystervark.Repository.Interface.IRepository`1" /> interface.
         /// </returns>
-        public IRepository<TEntity> GetRepository<TEntity>(int? tenantId = null)
+        public IRepository<TEntity> GetRepository<TEntity>()
             where TEntity : class
         {
             if (this._repositories == null)
@@ -76,10 +77,11 @@ namespace Ystervark.Repository.Implementation
             var type = typeof(TEntity);
             if (!this._repositories.ContainsKey(type))
             {
-                this._repositories[type] = new Repository<TEntity>(this.DbContext, tenantId);
+                this._repositories[type] = new Repository<TEntity>(this.DbContext,
+                    typeof(ITenant).IsAssignableFrom(typeof(TEntity)) ? this.TenantId : (int?) null);
             }
 
-            return (IRepository<TEntity>)this._repositories[type];
+            return (IRepository<TEntity>) this._repositories[type];
         }
 
         #endregion
@@ -241,6 +243,18 @@ namespace Ystervark.Repository.Implementation
 
             _disposed = true;
         }
+
+        #endregion
+
+        #region Implementation of ITenant
+
+        /// <summary>
+        /// Gets or sets the tenant identifier.
+        /// </summary>
+        /// <value>
+        /// The tenant identifier.
+        /// </value>
+        public int TenantId { get; set; }
 
         #endregion
     }
