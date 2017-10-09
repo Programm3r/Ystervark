@@ -1,0 +1,10 @@
+﻿#########################################################
+# Solution Specific excludes							#
+#########################################################
+
+node_modules/
+bower_components/
+wwwroot/css/
+wwwroot/fonts/
+wwwroot/js/
+wwwroot/libs/

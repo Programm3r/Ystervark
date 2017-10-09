@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 
 namespace Ystervarkie
 {
@@ -31,6 +30,19 @@ namespace Ystervarkie
             {
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
+
+                // Allow us to serve files from outside wwwroot
+                app.UseStaticFiles(new StaticFileOptions()
+                {
+                    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"App")),
+                    RequestPath = new PathString("")
+                });
+
+                app.UseStaticFiles(new StaticFileOptions()
+                {
+                    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"bower_components")),
+                    RequestPath = new PathString("")
+                });
             }
             else
             {
