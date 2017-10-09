@@ -8,3 +8,4 @@ wwwroot/css/
 wwwroot/fonts/
 wwwroot/js/
 wwwroot/libs/
+Views/Shared/_Layout.cshtml
