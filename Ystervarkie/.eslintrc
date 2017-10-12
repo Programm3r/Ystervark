@@ -1,0 +1,18 @@
+{
+  "extends": [ "eslint:recommended" ],
+  "plugins": [ "angular" ],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "angular": true,
+    "module": true,
+    "$": true,
+    "inject": true
+  },
+  "rules": {
+    "no-unused-vars": 1,
+    "angular/controller-name": [ 2, "/[A-Z]Controller$/" ]
+  }
+}

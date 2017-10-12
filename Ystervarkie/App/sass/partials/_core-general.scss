@@ -1,0 +1,65 @@
+﻿* {
+    outline-style: none !important;
+}
+
+body,
+body.boxed-layout #wrapper {
+    background-color: $brand-tertiary;
+}
+
+//Mixin calls to generate each type of spacing
+//Unused spacing classes can be avoided by simply not including them
+@include generate-spacing(padding, bottom);
+@include generate-spacing(padding, top);
+@include generate-spacing(padding, left);
+@include generate-spacing(padding, right);
+
+@include generate-spacing(margin, bottom);
+@include generate-spacing(margin, top);
+@include generate-spacing(margin, left);
+@include generate-spacing(margin, right);
+
+.hand-pointer {
+    cursor: pointer;
+    cursor: hand;
+}
+
+
+/* CONTAINERS */
+.middle-box {
+    max-width: 400px;
+    z-index: 100;
+    margin: 0 auto;
+    padding-top: 40px;
+}
+
+.box-content {
+    background-color: #FFF;
+    color: $text-color;
+    padding: 15px 20px 20px 20px;
+    border: 1px solid $gray-lighter;
+}
+
+/* BACKGROUNDS */
+.bg-gray {
+    background-color: $gray-lighter;
+    color: color-contrast($gray-lighter,$text-color);
+}
+
+.bg-secondary {
+    background-color: $brand-secondary;
+    color: color-contrast($brand-secondary);
+}
+
+/* TEXT */
+.text-primary {
+    color: $brand-primary;
+}
+
+.text-secondary {
+    color: $brand-secondary;
+}
+
+.text-gray {
+    color: $gray;
+}

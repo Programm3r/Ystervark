@@ -1,0 +1,46 @@
+﻿@import url('https://fonts.googleapis.com/css?family=Biryani:900');
+
+.error-page {
+    .error-info {
+        display: flex;
+
+        h2 {
+            font-family: 'Biryani', sans-serif;
+            text-align: left;
+        }
+
+        .error-number {
+            -webkit-flex: 1 0 0;
+            flex: 1 0 0;
+            border-right: 2px solid $brand-primary;
+            padding-right: 5px;
+
+            h2 {
+                color: $brand-danger;
+                font-size: 120px;
+                line-height: 100px;
+                margin: 20px 0 0 0px;
+            }
+        }
+
+        .error-description {
+            /* This will be twice as big as the small item. */
+            -webkit-flex: 2 0 0;
+            flex: 2 0 0;
+
+            h2 {
+                text-transform: uppercase;
+                line-height: 30px;
+                margin: 25px 0 0 5px;
+
+                span {
+                    line-height: 1em;
+                    font-size: 20px;
+                }
+            }
+        }
+    }
+
+    .error-details {
+    }
+}

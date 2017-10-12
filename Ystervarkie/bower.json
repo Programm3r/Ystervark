@@ -6,6 +6,7 @@
     "bootstrap-sass-official": "^3.3.7",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
+    "toastr": "^2.1.3",
     "angular": "^1.6.6",
     "angular-aria": "^1.6.6",
     "angular-sanitize": "^1.6.6",
@@ -15,13 +16,25 @@
     "angular-messages": "^1.6.6",
     "angular-ui-router": "^1.0.7",
     "oclazyload": "^1.1.0",
+    "angular-bootstrap": "^2.5.0",
+    "a0-angular-storage": "^0.0.15",
+    "angular-loading-bar": "^0.9.0",
+    "angular-breadcrumb": "^0.5.0",
+    "angular-filter": "^0.5.17",
+    "wow": "wowjs#^1.1.2",
+    "angular-scroll": "^1.0.2",
+    "json-formatter": "^0.6.0",
     "animate.css": "^3.5.2",
-    "hint.css": "^2.5.0"
+    "ds6-scroll-class": "^1.0.0"
   },
   "group": {
     "app": [
       "fontawesome",
       "bootstrap-sass-official",
+      "lodash",
+      "moment",
+      "toastr",
+      "animate.css",
       "angular",
       "angular-aria",
       "angular-sanitize",
@@ -30,9 +43,13 @@
       "angular-animate",
       "angular-messages",
       "angular-ui-router",
+      "a0-angular-storage",
       "oclazyload",
-      "animate.css",
-      "hint.css"
+      "angular-bootstrap",
+      "angular-loading-bar",
+      "angular-scroll",
+      "angular-breadcrumb",
+      "angular-filter"
     ]
   }
 }
