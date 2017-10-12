@@ -1,0 +1,126 @@
+﻿// Import the variables
+@import 'variables';
+
+// =============================================================================
+// String Replace
+// =============================================================================
+
+@function str-replace($string, $search, $replace: "") {
+    $index: str-index($string, $search);
+
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+
+    @return $string;
+}
+
+// =============================================================================
+// Font Face
+// =============================================================================
+
+@mixin font-face($name, $path, $weight: null, $style: null, $exts: eot woff2 woff ttf svg) {
+    $src: null;
+
+    $extmods: ( eot: "?", svg: "#" + str-replace($name, " ", "_") );
+
+    $formats: ( otf: "opentype", ttf: "truetype" );
+
+    @each $ext in $exts {
+        $extmod: if(map-has-key($extmods, $ext), $ext + map-get($extmods, $ext), $ext);
+        $format: if(map-has-key($formats, $ext), map-get($formats, $ext), $ext);
+        $src: append($src, url(quote($path + $name + "." + $extmod)) format(quote($format)), comma);
+    }
+
+    @font-face {
+        font-family: quote($name);
+        font-style: $style;
+        font-weight: $weight;
+        src: $src;
+    }
+}
+
+// =============================================================================
+// Font Size
+// =============================================================================
+@function calculateRem($size) {
+    $remSize: $size / 16px;
+    @return $remSize * 1rem;
+}
+
+@mixin font-size($size: $font-size-base) {
+    font-size: $size;
+    font-size: calculateRem($size);
+}
+
+// =============================================================================
+// Text-contrast
+// =============================================================================
+
+// For loop inumerator
+$num: 0;
+
+// Calculeate brightness of a given color.
+@function brightness($color) {
+    @return ((red($color) * .299) + (green($color) * .587) + (blue($color) * .114)) / 255 * 100%;
+}
+
+// Compares contrast of a given color to the light/dark arguments and returns whichever is most "contrasty"
+@function color-contrast($color, $dark: $dark-text-default, $light: $light-text-default) {
+    @if $color == null {
+        @return null;
+    }
+    @else {
+        $color-brightness: brightness($color);
+        $light-text-brightness: brightness($light);
+        $dark-text-brightness: brightness($dark);
+
+        @return if(abs($color-brightness - $light-text-brightness) > abs($color-brightness - $dark-text-brightness), $light, $dark);
+    }
+}
+
+// =============================================================================
+// Hex to Rgba
+// =============================================================================
+@mixin background-opacity($color, $opacity: 0.3) {
+    background: $color; /* The Fallback */
+    background: rgba($color, $opacity);
+}
+
+// =============================================================================
+// Space helpers
+// =============================================================================
+//
+// USAGE:
+// @include generate-spacing(margin, bottom);
+// @include generate-spacing(margin, top);
+// @include generate-spacing(margin, left);
+// @include generate-spacing(margin, right);
+// @include generate-spacing(padding, bottom);
+// @include generate-spacing(padding, top);
+// @include generate-spacing(padding, left);
+// @include generate-spacing(padding, right);
+// =============================================================================
+
+$default-spacing: 15px;
+//Map of spacing amounts and their corresponding shortnames
+$spaceamounts: ( xxs: 1px, xs: 5px, sm: 10px, md: 20px, lg: 30px, xl: 40px );
+
+//Map of spacing directions and their corresponding shortnames
+$directions: ( top: t, bottom: b, left: l, right: r );
+
+//Map of spacing types and their corresponding shortnames
+$types: ( margin: m, padding: p );
+
+//Main mixin that generates the classes
+@mixin generate-spacing($type, $direction) {
+    #{&}.#{map-get($types, $type)}-#{map-get($directions, $direction)} {
+        #{$type}-#{$direction}: #{$default-spacing};
+    }
+
+    @each $name, $space in $spaceamounts {
+        #{&}.#{map-get($types, $type)}-#{map-get($directions, $direction)}-#{$name} {
+            #{$type}-#{$direction}: #{$space};
+        }
+    }
+}
