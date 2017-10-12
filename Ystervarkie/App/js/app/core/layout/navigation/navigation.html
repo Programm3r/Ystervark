@@ -1,0 +1,52 @@
+<!--<nav class="navbar-default navbar-static-side" role="navigation">-->
+<div class="sidebar-collapse">
+    <ul side-navigation class="nav metismenu" id="side-menu">
+        <li class="nav-header metismenu-header">
+            <div class="profile-element" uib-dropdown>
+                <div class="background-pattern">
+                    <div class="flex-container">
+                        <div class="flex-small-container">
+                            <img alt="image" class="img-circle" ng-src="{{coreCtrl.activeUser().ImageUrl}}" />
+                        </div>
+                        <a uib-dropdown-toggle href="#" class="flex-big-container">
+                            <span class="clear">
+                                <span class="block m-t-xs">
+                                    <strong class="font-bold">{{coreCtrl.activeUser().FullName || 'Unknown User'}}</strong>
+                                </span>
+                                <span class="text-muted text-xs block">{{coreCtrl.activeUser().HighestRoleName()}}<b class="caret"></b></span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <ul uib-dropdown-menu class="m-t-xs m-l-lg">
+                    <li ng-repeat="stateItem in navCtrl.stateMenuItems">
+                        <a ui-sref="{{ stateItem.link }}" ng-cloak>{{ stateItem.title }}</a>
+                    </li>
+                    <li ng-if="navCtrl.stateMenuItems.length > 0" class="divider"></li>
+                    <li><a ng-click="coreCtrl.logOut()">Log out</a></li>
+                </ul>
+            </div>
+            <div class="logo-element">
+                <svg class="logo-icon">
+                    <use xlink:href="#briteplan_logo" />
+                </svg>
+            </div>
+        </li>
+        
+        <!--Creating Manual Links-->
+
+        <li ui-sref-active="active">
+            <a ui-sref="app.dashboard"><i class="fa fa-dashboard"></i><span class="nav-label">Dashboard</span> </a>
+        </li>
+        <!--<li ng-class="{active: $state.includes('app.crm')}">
+            <a href="#"><i class="fa fa-exchange"></i> <span class="nav-label">Parent</span><span class="fa arrow"></span></a>
+            <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('app.crm')}">
+                <li ui-sref-active="active"><a ui-sref="app.parent.child1">child1</a></li>
+                <li ui-sref-active="active"><a ui-sref="app.parent.child2">child2</a></li>
+                <li ui-sref-active="active"><a ui-sref="app.parent.child3">child3</a></li>
+            </ul>
+        </li>-->
+
+    </ul>
+</div>
+<!--</nav>-->

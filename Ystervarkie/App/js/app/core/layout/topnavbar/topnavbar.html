@@ -1,0 +1,108 @@
+<nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0" id="top-nav-bar">
+    <div class="navbar-header">
+        <span minimaliza-sidebar></span>
+    </div>
+    <ul class="nav navbar-top-links navbar-right">
+        <!-- start: LANGUAGE SWITCHER -->
+        <li access-if="admin">
+            <a class="count-info" ui-sref="app.tenant-configuration">
+                <span ng-class="coreCtrl.hintCss.bli" aria-label="Tenant Configuration">
+                    <i class="fa fa-cogs"></i>
+                </span>
+            </a> 
+        </li>
+        <!--MY MESSAGES SECTION-->
+        <li uib-dropdown>
+            <a class="count-info" href="" uib-dropdown-toggle ng-class="coreCtrl.myMessagesAminate">
+                <i class="fa fa-envelope"></i> <span class="label label-success">{{coreCtrl.myMessagesCount}}</span>
+            </a>
+            <ul class="dropdown-messages" uib-dropdown-menu>
+                <li ng-repeat-start="a in coreCtrl.myMessagesDisplayed">
+                    <div class="dropdown-messages-box">
+                        <a ui-sref="profile" class="pull-left">
+                            <img alt="image" class="img-circle" ng-src="{{a.ImageUrl}}">
+                        </a>
+                        <div>
+                            <strong>{{a.FromResource}}</strong> sent a message. <br>
+                            <small class="text-muted">{{a.Duration}} ago at {{a.Time}} - {{a.DisplayDate}}</small>
+                        </div>
+                    </div>
+                </li>
+                <li class="divider" ng-repeat-end>></li>
+                <li>
+                    <div class="text-center link-block">
+                        <a ui-sref="app.messages">
+                            <i class="fa fa-envelope"></i> <strong>View All Messages</strong>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <!--APPROVAL TASKS SECTION-->
+        <li uib-dropdown ng-if="coreCtrl.activeUser().HasApprovalRole()">
+            <a class="count-info" href="#" uib-dropdown-toggle ng-class="coreCtrl.approvalTaskAminate">
+                <i class="fa fa-bullhorn"></i> <span class="label label-warning">{{coreCtrl.approvalTaskCount}}</span>
+            </a>
+            <ul class="dropdown-messages" uib-dropdown-menu ng-if="coreCtrl.displayedApprovalTasks.length > 0">
+                <li ng-repeat-start="a in coreCtrl.displayedApprovalTasks">
+                    <div class="dropdown-messages-box">
+                        <a ui-sref="app.resources.manage.overview({resourceId:a.ResourceId})" class="pull-left">
+                            <img alt="image" class="img-circle" ng-src="{{a.ImageUrl}}">
+                        </a>
+
+                        <div>
+                            <strong>{{a.EntityType}}</strong> pending - logged by <strong>{{a.Requested}}</strong> <br>
+                            <small class="text-muted">{{a.Duration}} ago at {{a.Time}} - {{a.DisplayDate}}</small>
+                        </div>
+                    </div>
+                </li>
+                <li class="divider" ng-repeat-end></li>
+                <li>
+                    <div class="text-center link-block">
+                        <a ui-sref="app.tasks.approvals">
+                            <i class="fa fa-thumbs-o-up"></i> <strong>View Work List</strong>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <!--MY TASKS SECTION-->
+        <li uib-dropdown>
+            <a class="count-info" href="" uib-dropdown-toggle ng-class="coreCtrl.myTaskAminate">
+                <i class="fa fa-trophy"></i> <span class="label label-primary">{{coreCtrl.myTaskCount}}</span>
+            </a>
+            <ul class="dropdown-alerts" uib-dropdown-menu ng-if="coreCtrl.displayedMyTasks.length > 0">
+                <li ng-repeat-start="m in coreCtrl.displayedMyTasks">
+                    <div class="dropdown-messages-box">
+                        <a href="" class="pull-left">
+                            <img alt="image" class="img-circle" ng-src="{{m.ImageUrl}}">
+                        </a>
+                        <div>
+                            Task from <strong>{{m.Requested}}</strong> <br>
+                            <span class="ng-class:::coreCtrl.hintCss.bl;" ng-class="{'hint--warning': m.Status === coreCtrl.notStarted, 'hint--info': m.Status === coreCtrl.inProgress}" aria-label="{{m.DisplayStatus}}: {{m.Description}}"><small>{{m.Description | truncate: 30: '...'}}</small> </span>
+                            <!--<span class="pull-right">
+                                <span class="label label-tiny" ng-class="m.Status === coreCtrl.inProgress ? 'label-success' : m.Status === coreCtrl.notStarted ? 'label-warning' : ''">
+                                    {{m.DisplayStatus}}
+                                </span>
+                            </span><br>-->
+                            <small class="text-muted">{{m.Duration}} ago at {{m.Time}} - {{m.DisplayDate}}</small>
+                        </div>
+                    </div>
+                </li>
+                <li class="divider" ng-repeat-end></li>
+                <li>
+                    <div class="text-center link-block">
+                        <a ui-sref="app.tasks.approvals">
+                            <strong>See All Project Tasks</strong>
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <li><a ng-click="coreCtrl.logOut()"><i class="fa fa-sign-out"></i> Log out</a></li>
+        <!--<li>
+            <a ng-click="$root.rightSidebar = !$root.rightSidebar"><i class="fa fa-tasks"></i></a>
+        </li>-->
+    </ul>
+</nav>

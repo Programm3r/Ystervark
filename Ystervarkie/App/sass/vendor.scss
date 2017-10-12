@@ -18,7 +18,11 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700");
 
 // -------------------------------------------------------------------------------------------------------
-//  Import bootstrap and fontawesome
+//  Import bootstrap, fontawesome and toastr
 // -------------------------------------------------------------------------------------------------------
 @import "bootstrap";
 @import "font-awesome";
+@import "vendorOverrides/toastr";
+
+/* inject:css */
+/* endinject */

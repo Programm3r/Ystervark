@@ -17,12 +17,17 @@
         }
 
         var config = {
+            // Filenames used for JS and CSS concatinated files.
+            filename: {
+                app: 'app',
+                libs:'vendor'
+            },
             index: {
                 in: baseDir.app + '/index.cshtml',
                 out: './Views/Shared',
                 appInjectOptions: {
                     name: 'app',
-                    ignorePath: 'wwwroot',
+                    ignorePath: 'App',
                     addPrefix: '~',
                     addRootSlash: false
                 },
@@ -37,27 +42,30 @@
                 in: baseDir.app + '/**/*.html',
                 out: 'templates.js',
                 templateCacheOpts: {
-                    module: 'ftdsApp.core',
+                    module: 'yvApp.core',
                     root: 'app/',
                     standalone: false
                 }
             },
             sass: {
-                in: [
-                    baseDir.app + '/sass/style.scss',
-                    baseDir.app + '/sass/vendor.scss'
-                ],
-                inject: [baseDir.app + '/sass/partials/**/*.scss'],
-                injectIgnorePath: [baseDir.app + '/sass/partials'],
-                includePaths: [
-                    baseDir.bower + '/bootstrap-sass-official/assets/stylesheets',
-                    baseDir.bower + '/fontawesome/scss',
-                ],
+                app: {
+                    in: baseDir.app + '/sass',
+                    inject: [baseDir.app + '/sass/partials/**/*.scss'],
+                    injectIgnorePath: [baseDir.app + '/sass/partials'],
+                },
+                vendor: {
+                    in: baseDir.app + '/sass',
+                    includePaths: [
+                        baseDir.bower + '/bootstrap-sass-official/assets/stylesheets',
+                        baseDir.bower + '/fontawesome/scss',
+                        baseDir.bower + '/toastr'
+                    ],
+                },                
                 out: baseDir.web + '/css'
             },
             js: {
                 in: baseDir.app + '/**/*.js',
-                out: []
+                out: baseDir.web + '/js'
             },
             fonts: {
                 in: [
@@ -70,15 +78,18 @@
             libs: {
                 main: {
                     getfiles: function (options, isMinFiles) {
-                        return getBowerFiles(options, isMinFiles, false);
-                    },
-                    Js: {
-                        minFileName: 'vendor.min.js',
-                        out: baseDir.web + '/js',
-                    },
-                    Css: {
-                        minFileName: 'vendor.min.css',
-                        out: baseDir.web + '/css',
+                        var defaultOptions = {
+                            "overrides": {
+                                "toastr": {
+                                    "main": ["toastr.js"]
+                                },
+                                "a0-angular-storage": {
+                                    "main": ["dist/angular-storage.min.js"]
+                                }
+                            }
+                        };
+                        var opts = (options) ? _.merge(options, defaultOptions) : defaultOptions
+                        return getBowerFiles(opts, isMinFiles, false);
                     }
                 },
                 lazy: {
@@ -147,7 +158,6 @@
 
     function getBowerFiles(options, isMinFiles, isLazyFiles) {
         
-
         var defaultOptions = {
             checkExistence: 'true',
             group: bowerAppGroupName

@@ -1,0 +1,19 @@
+<div class="middle-box text-center animated fadeInDown">
+    <div class="error-info">
+        <div class="error-number">
+            <h2>500</h2>
+        </div>
+        <div class="error-description">
+            <h2>Internal<br /><span class="text-muted">Server Error</span></h2>
+        </div>
+    </div>
+
+
+    <div class="error-details m-t-lg">
+        {{vm.errorMessage}}<br />
+        <div class="row m-t">
+            <div class="col-sm-6"><a ui-sref="public.login" class="btn btn-block btn-primary">Home</a></div>
+            <div class="col-sm-6"><a ui-sref="app.dashboard" class="btn btn-block btn-primary">Dashboard</a></div>
+        </div>
+    </div>
+</div>

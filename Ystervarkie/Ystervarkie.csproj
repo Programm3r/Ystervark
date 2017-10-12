@@ -5,6 +5,37 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="App\js\blocks\**" />
+    <Compile Remove="App\js\common\**" />
+    <Compile Remove="App\js\core\**" />
+    <Compile Remove="App\js\data-layers\**" />
+    <Compile Remove="App\js\features\**" />
+    <Compile Remove="App\js\layout\**" />
+    <Compile Remove="App\js\widgets\**" />
+    <Content Remove="App\js\blocks\**" />
+    <Content Remove="App\js\common\**" />
+    <Content Remove="App\js\core\**" />
+    <Content Remove="App\js\data-layers\**" />
+    <Content Remove="App\js\features\**" />
+    <Content Remove="App\js\layout\**" />
+    <Content Remove="App\js\widgets\**" />
+    <EmbeddedResource Remove="App\js\blocks\**" />
+    <EmbeddedResource Remove="App\js\common\**" />
+    <EmbeddedResource Remove="App\js\core\**" />
+    <EmbeddedResource Remove="App\js\data-layers\**" />
+    <EmbeddedResource Remove="App\js\features\**" />
+    <EmbeddedResource Remove="App\js\layout\**" />
+    <EmbeddedResource Remove="App\js\widgets\**" />
+    <None Remove="App\js\blocks\**" />
+    <None Remove="App\js\common\**" />
+    <None Remove="App\js\core\**" />
+    <None Remove="App\js\data-layers\**" />
+    <None Remove="App\js\features\**" />
+    <None Remove="App\js\layout\**" />
+    <None Remove="App\js\widgets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
   </ItemGroup>
 
@@ -13,9 +44,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="App\fonts\" />
-    <Folder Include="mamba\" />
+    <Folder Include="App\js\app\common\services\" />
     <Folder Include="wwwroot\css\" />
   </ItemGroup>
+
+  <Target Name="PrecompileScript" BeforeTargets="BeforeBuild">
+    <Exec Command="gulp build" />
+  </Target>
+
+  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
+    <Exec Command="bower install" />
+    <Exec Command="gulp publish" />
+  </Target>
 
 </Project>

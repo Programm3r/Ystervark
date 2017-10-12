@@ -66,7 +66,7 @@ $num: 0;
 }
 
 // Compares contrast of a given color to the light/dark arguments and returns whichever is most "contrasty"
-@function color-contrast($color, $dark: $dark-text-default, $light: $light-text-default) {
+@function color-contrast($color, $dark: #000, $light:#fff) {
     @if $color == null {
         @return null;
     }
